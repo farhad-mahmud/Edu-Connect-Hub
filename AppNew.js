@@ -4,7 +4,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from './src/constants/colors';
 
 // Import Screens
@@ -107,8 +106,6 @@ function ExpertsStack() {
 
 // Main Tab Navigator
 function TabNavigator() {
-  const insets = useSafeAreaInsets();
-  
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -134,8 +131,8 @@ function TabNavigator() {
         tabBarStyle: {
           backgroundColor: colors.white,
           borderTopColor: colors.border,
-          height: 60 + insets.bottom,
-          paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
+          height: 60,
+          paddingBottom: 8,
           paddingTop: 8,
         },
         headerShown: false,
@@ -153,11 +150,11 @@ function TabNavigator() {
 // Main App Component
 export default function App() {
   return (
-    <SafeAreaProvider>
+    <>
       <StatusBar style="dark" />
       <NavigationContainer>
         <TabNavigator />
       </NavigationContainer>
-    </SafeAreaProvider>
+    </>
   );
 }
