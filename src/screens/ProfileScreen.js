@@ -11,15 +11,17 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../constants/colors';
+import { useAuth } from '../context/AuthContext';
 
 const ProfileScreen = ({ navigation }) => {
+  const { signOut, user } = useAuth();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [darkModeEnabled, setDarkModeEnabled] = useState(false);
 
   const profileData = {
     name: 'Shahriar Kabir',
     email: 'shahriar.kabir@university.edu',
-    role: 'PhD Student',
+  role: user?.role ? user.role[0].toUpperCase() + user.role.slice(1) : 'PhD Student',
     institution: 'Massachusetts Institute of Technology',
     avatar: require('../../assets/shahriar-kabir.jpg'),
     bio: 'Passionate researcher in AI and Machine Learning. Looking to collaborate on innovative projects.',
@@ -185,7 +187,7 @@ const ProfileScreen = ({ navigation }) => {
         </View>
 
         {/* Logout Button */}
-        <TouchableOpacity style={styles.logoutButton}>
+        <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
           <Ionicons name="log-out-outline" size={22} color={colors.danger} />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>

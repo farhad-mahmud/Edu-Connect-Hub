@@ -11,8 +11,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../constants/colors';
+import { useAuth } from '../context/AuthContext';
 
 const HomeScreen = ({ navigation }) => {
+  const { user } = useAuth();
   const [posts, setPosts] = useState([
     {
       id: '1',
@@ -170,17 +172,19 @@ const HomeScreen = ({ navigation }) => {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={() => (
-          <TouchableOpacity 
-            style={styles.createPostButton}
-            onPress={() => navigation.navigate('CreatePost')}
-          >
-            <Image 
-              source={require('../../assets/shahriar-kabir.jpg')} 
-              style={styles.smallAvatar} 
-            />
-            <Text style={styles.createPostText}>Share your thoughts...</Text>
-            <Ionicons name="images-outline" size={24} color={colors.primary} />
-          </TouchableOpacity>
+          (['expert', 'teacher', 'admin'].includes(user?.role)) ? (
+            <TouchableOpacity 
+              style={styles.createPostButton}
+              onPress={() => navigation.navigate('CreatePost')}
+            >
+              <Image 
+                source={require('../../assets/shahriar-kabir.jpg')} 
+                style={styles.smallAvatar} 
+              />
+              <Text style={styles.createPostText}>Share your thoughts...</Text>
+              <Ionicons name="images-outline" size={24} color={colors.primary} />
+            </TouchableOpacity>
+          ) : null
         )}
       />
     </SafeAreaView>

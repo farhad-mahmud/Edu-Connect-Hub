@@ -6,6 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from './src/constants/colors';
+import { AuthProvider, useAuth } from './src/context/AuthContext';
+import LoginScreen from './src/screens/LoginScreen';
 
 // Import Screens
 import HomeScreen from './src/screens/HomeScreen';
@@ -19,6 +21,7 @@ import ExpertDetailScreen from './src/screens/ExpertDetailScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import CreatePostScreen from './src/screens/CreatePostScreen';
 import CreateJobScreen from './src/screens/CreateJobScreen';
+import AdminDashboardScreen from './src/screens/AdminDashboardScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -108,9 +111,23 @@ function ExpertsStack() {
 // Main Tab Navigator
 function TabNavigator() {
   const insets = useSafeAreaInsets();
+  const { user } = useAuth();
+  const initialRoute = (() => {
+    switch (user?.role) {
+      case 'expert':
+        return 'Experts';
+      case 'teacher':
+        return 'Home';
+      case 'admin':
+        return 'Profile';
+      default:
+        return 'Home';
+    }
+  })();
   
   return (
     <Tab.Navigator
+      initialRouteName={initialRoute}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
@@ -145,8 +162,32 @@ function TabNavigator() {
       <Tab.Screen name="Jobs" component={JobsStack} />
       <Tab.Screen name="Messages" component={MessagesStack} />
       <Tab.Screen name="Experts" component={ExpertsStack} />
+      {user?.role === 'admin' && (
+        <Tab.Screen name="Admin" component={AdminDashboardScreen} />
+      )}
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
+  );
+}
+
+// Decides between Auth flow and Main app based on auth state
+function RootNavigator() {
+  const { user, bootstrapped } = useAuth();
+  if (!bootstrapped) {
+    return (
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Splash" component={() => null} />
+      </Stack.Navigator>
+    );
+  }
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {!user ? (
+        <Stack.Screen name="Auth" component={LoginScreen} />
+      ) : (
+        <Stack.Screen name="Main" component={TabNavigator} />
+      )}
+    </Stack.Navigator>
   );
 }
 
@@ -155,9 +196,11 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <StatusBar style="dark" />
-      <NavigationContainer>
-        <TabNavigator />
-      </NavigationContainer>
+      <AuthProvider>
+        <NavigationContainer>
+          <RootNavigator />
+        </NavigationContainer>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }

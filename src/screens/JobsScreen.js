@@ -10,8 +10,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../constants/colors';
+import { useAuth } from '../context/AuthContext';
 
 const JobsScreen = ({ navigation }) => {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
@@ -195,13 +197,15 @@ const JobsScreen = ({ navigation }) => {
             <Text style={styles.resultsText}>
               {filteredJobs.length} jobs found
             </Text>
-            <TouchableOpacity 
-              style={styles.postJobButton}
-              onPress={() => navigation.navigate('CreateJob')}
-            >
-              <Ionicons name="add-circle-outline" size={20} color={colors.white} />
-              <Text style={styles.postJobText}>Post Job</Text>
-            </TouchableOpacity>
+            {(['expert', 'teacher', 'admin'].includes(user?.role)) && (
+              <TouchableOpacity 
+                style={styles.postJobButton}
+                onPress={() => navigation.navigate('CreateJob')}
+              >
+                <Ionicons name="add-circle-outline" size={20} color={colors.white} />
+                <Text style={styles.postJobText}>Post Job</Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
       />
